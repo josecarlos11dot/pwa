@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard – Capturas pendientes</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="stylesheet" href="/style.css" />
+  <meta name="theme-color" content="#0f172a" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Dashboard – Pendientes</h1>
+    <nav>
+      <a class="btn" href="/capture.html">+ Capturar (iPhone)</a>
+      <button id="refresh" class="btn">Actualizar</button>
+    </nav>
+  </header>
+
+  <main class="layout">
+    <section>
+      <h2>Pendientes por registrar</h2>
+      <div id="pending" class="grid-cards"></div>
+    </section>
+    <aside>
+      <h2>Registrados (hoy)</h2>
+      <div id="registered" class="list-registered"></div>
+    </aside>
+  </main>
+
+  <dialog id="viewer">
+    <img id="viewerImg" alt="Vista ampliada" />
+    <form method="dialog">
+      <button class="btn">Cerrar</button>
+    </form>
+  </dialog>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Captura</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="stylesheet" href="/style.css" />
+  <meta name="theme-color" content="#0f172a" />
+</head>
+<body class="capture">
+  <header class="topbar">
+    <h1>Capturar vehículo</h1>
+    <nav>
+      <a class="btn" href="/">Dashboard</a>
+    </nav>
+  </header>
+
+  <main class="capture-main">
+    <form id="captureForm">
+      <label class="camera">
+        <input id="photo" type="file" accept="image/*" capture="environment" required />
+      </label>
+      <button class="btn big" type="submit">Enviar captura</button>
+      <p id="status"></p>
+    </form>
+  </main>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
