@@ -2,5 +2,8 @@
   "name": "pwa-captura-dashboard",
   "version": "1.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "mongodb": "^6.20.0"
+  }
 }
