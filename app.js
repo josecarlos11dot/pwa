@@ -222,7 +222,24 @@ if (pendingBox || regBox){
   });
 }
 
-// PWA register service worker
-if ('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js').catch(console.error);
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then((reg) => {
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        nw?.addEventListener('statechange', () => {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            location.reload(); // recarga para usar la versión nueva
+          }
+        });
+      });
+    });
+
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      location.reload();
+    });
+  });
 }
