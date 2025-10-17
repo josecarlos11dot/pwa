@@ -1,12 +1,22 @@
-import { MongoClient } from 'mongodb';
+// api/db.js
+import { MongoClient, ServerApiVersion } from "mongodb";
 
-let client;
-let db;
+const uri = process.env.MONGODB_URI; // debe ser mongodb+srv://...kxito...
+const dbName = process.env.MONGODB_DB || "carwash";
 
-export async function getDb(){
-  if (db) return db;
-  client = new MongoClient(process.env.MONGODB_URI);
-  await client.connect();
-  db = client.db(process.env.MONGODB_DB);
-  return db;
+if (!uri) {
+  throw new Error("Missing MONGODB_URI");
+}
+
+let clientPromise;
+
+export async function getDb() {
+  if (!clientPromise) {
+    const client = new MongoClient(uri, {
+      serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true },
+    });
+    clientPromise = client.connect();
+  }
+  const client = await clientPromise;
+  return client.db(dbName);
 }
