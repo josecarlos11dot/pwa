@@ -17,12 +17,22 @@
   </header>
 
 <main class="capture-main">
-  <!-- input oculto, abre cámara trasera -->
-  <input id="photo" type="file" accept="image/*" capture="environment" hidden />
+  <!-- Vista previa en vivo -->
+  <video id="preview" autoplay playsinline muted style="width:100%; max-height:65vh; border-radius:12px; background:#000"></video>
 
-  <button id="snapAndSend" class="btn big" type="button">Tomar y enviar</button>
+  <!-- Canvas oculto para “congelar” y extraer el frame -->
+  <canvas id="frame" hidden></canvas>
+
+  <!-- Fallback por si la cámara falla (iOS permisos, etc.) -->
+  <input id="photoFallback" type="file" accept="image/*" capture="environment" hidden />
+
+  <div style="display:flex; gap:12px; margin-top:12px;">
+    <button id="snapAndSend" class="btn big" type="button">Capturar y enviar</button>
+    <button id="retry" class="btn" type="button" hidden>Reintentar cámara</button>
+  </div>
   <p id="status"></p>
 </main>
+
 
 
   <script src="/app.js" type="module"></script>
