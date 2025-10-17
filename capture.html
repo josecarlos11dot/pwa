@@ -16,15 +16,14 @@
     </nav>
   </header>
 
-  <main class="capture-main">
-    <form id="captureForm">
-      <label class="camera">
-        <input id="photo" type="file" accept="image/*" capture="environment" required />
-      </label>
-      <button class="btn big" type="submit">Enviar captura</button>
-      <p id="status"></p>
-    </form>
-  </main>
+<main class="capture-main">
+  <!-- input oculto, abre cámara trasera -->
+  <input id="photo" type="file" accept="image/*" capture="environment" hidden />
+
+  <button id="snapAndSend" class="btn big" type="button">Tomar y enviar</button>
+  <p id="status"></p>
+</main>
+
 
   <script src="/app.js" type="module"></script>
 </body>

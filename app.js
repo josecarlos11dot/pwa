@@ -12,18 +12,28 @@ const qs = (s, r=document) => r.querySelector(s);
 const qsa = (s, r=document) => [...r.querySelectorAll(s)];
 
 // Capture page logic
-const captureForm = qs('#captureForm');
-if (captureForm) {
-  const statusEl = qs('#status');
-  captureForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const file = qs('#photo').files[0];
+// Capture page logic — versión automática (solo tomar y enviar)
+const photoInput = qs('#photo');
+const snapBtn = qs('#snapAndSend');
+const statusEl = qs('#status');
+
+if (photoInput && snapBtn) {
+  snapBtn.addEventListener('click', () => {
+    // Abre la cámara directamente
+    photoInput.click();
+  });
+
+  // En cuanto se toma la foto, se dispara este evento
+  photoInput.addEventListener('change', async () => {
+    const file = photoInput.files?.[0];
     if (!file) return;
-    statusEl.textContent = 'Preparando subida…';
 
     try {
+      snapBtn.disabled = true;
+      statusEl.textContent = '📸 Subiendo captura…';
+
       // 1) pedir firma al backend
-      const ts = Math.floor(Date.now()/1000);
+      const ts = Math.floor(Date.now() / 1000);
       const signRes = await fetch(api.sign + `?timestamp=${ts}`);
       const sign = await signRes.json();
 
@@ -35,28 +45,33 @@ if (captureForm) {
       fd.append('signature', sign.signature);
       fd.append('folder', sign.folder);
       const upUrl = `https://api.cloudinary.com/v1_1/${sign.cloud_name}/auto/upload`;
-      statusEl.textContent = 'Subiendo foto…';
+
+      statusEl.textContent = '☁️ Enviando a Cloudinary…';
       const upRes = await fetch(upUrl, { method: 'POST', body: fd });
       const up = await upRes.json();
-      if (!up.secure_url) throw new Error('Fallo subida Cloudinary');
+      if (!up.secure_url) throw new Error('Fallo en subida');
 
       // 3) crear registro en backend
-      statusEl.textContent = 'Creando tarjeta…';
+      statusEl.textContent = '🧾 Creando registro…';
       const createRes = await fetch(api.create, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: up.secure_url })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: up.secure_url }),
       });
       const created = await createRes.json();
       if (!created.ok) throw new Error(created.error || 'Error al crear');
 
-      statusEl.textContent = `✅ Enviado. Folio ${created.folioDiario} (${fmtTime(created.createdAt)})`;
-      qs('#photo').value = '';
+      statusEl.textContent = `✅ Enviado · Folio ${created.folioDiario}`;
+      photoInput.value = '';
     } catch (err) {
       console.error(err);
-      statusEl.textContent = '❌ Error: ' + err.message;
+      statusEl.textContent = '❌ Error: ' + (err.message || err);
+    } finally {
+      snapBtn.disabled = false;
     }
   });
 }
+
 
 // Dashboard logic
 const pendingBox = qs('#pending');
