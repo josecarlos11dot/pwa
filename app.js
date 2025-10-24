@@ -160,31 +160,44 @@ const viewerImg = qs('#viewerImg');
 
 async function loadPending(){
   if (!pendingBox) return;
-  const res = await fetch(api.listPending);
-  const data = await res.json();
-  pendingBox.innerHTML = '';
-  data.items.forEach(item => {
-    const el = document.createElement('article');
-    el.className = 'card';
-    el.innerHTML = `
-      <img src="${item.imageUrl}" alt="foto" />
-      <div class="meta">
-        <div>
-          <div>Folio <strong>${item.folioDiario}</strong></div>
-          <small>${fmtTime(item.createdAt)}</small>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button class="btn" data-act="register" data-id="${item._id}">Registrar</button>
-        </div>
-      </div>`;
-    const img = el.querySelector('img');
-    img.addEventListener('click', ()=>{
-      viewerImg.src = item.imageUrl;
-      viewer.showModal();
+  try {
+    const res = await fetch(api.listPending + `?t=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const items = Array.isArray(data.items) ? data.items : [];
+    pendingBox.innerHTML = '';
+
+    if (!items.length) {
+      pendingBox.innerHTML = '<p style="opacity:.7">Sin pendientes.</p>';
+      return;
+    }
+
+    items.forEach(item => {
+      const el = document.createElement('article');
+      el.className = 'card';
+      el.innerHTML = `
+        <img src="${item.imageUrl}" alt="foto" />
+        <div class="meta">
+          <div>
+            <div>Folio <strong>${item.folioDiario ?? '—'}</strong></div>
+            <small>${item.createdAt ? fmtTime(item.createdAt) : ''}</small>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn" data-act="register" data-id="${item._id}">Registrar</button>
+          </div>
+        </div>`;
+      el.querySelector('img').addEventListener('click', ()=>{
+        viewerImg.src = item.imageUrl;
+        viewer.showModal();
+      });
+      pendingBox.appendChild(el);
     });
-    pendingBox.appendChild(el);
-  });
+  } catch (err) {
+    console.error('loadPending error:', err);
+    pendingBox.innerHTML = `<p style="color:#b91c1c">Error al cargar pendientes: ${String(err.message || err)}</p>`;
+  }
 }
+
 
 async function loadRegistered(){
   if (!regBox) return;
